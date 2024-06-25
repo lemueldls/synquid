@@ -309,7 +309,7 @@ typeApplySolution _ AnyT = AnyT
 typeFromSchema :: RSchema -> RType
 typeFromSchema (Monotype t) = t
 typeFromSchema (ForallT _ t) = typeFromSchema t
-typeFromSchema (ForallP _ t) = typeFromSchema t 
+typeFromSchema (ForallP _ t) = typeFromSchema t
 
 allRefinementsOf :: RSchema -> [Formula]
 allRefinementsOf sch = allRefinementsOf' $ typeFromSchema sch

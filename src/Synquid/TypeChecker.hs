@@ -18,6 +18,7 @@ import qualified Data.Map as Map
 import Data.Map (Map)
 import qualified Data.Foldable as F
 import Control.Monad.Logic
+import Control.Monad
 import Control.Monad.State
 import Control.Monad.Reader
 import Control.Applicative hiding (empty)

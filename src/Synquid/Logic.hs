@@ -1,4 +1,5 @@
 {-# LANGUAGE TemplateHaskell, Rank2Types #-}
+{-# OPTIONS_GHC -Wno-missing-import-lists #-}
 
 -- | Formulas of the refinement logic
 module Synquid.Logic where

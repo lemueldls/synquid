@@ -21,7 +21,9 @@ import Data.Set (Set)
 import qualified Data.Map as Map
 import Data.Map (Map)
 import Data.Char
+import Control.Monad
 import Control.Monad.Logic
+import Control.Monad
 import Control.Monad.State
 import Control.Monad.Reader
 import Control.Applicative hiding (empty)
@@ -118,8 +120,8 @@ runExplorer :: MonadHorn s => ExplorerParams -> TypingParams -> Reconstructor s 
 runExplorer eParams tParams topLevel initTS go = do
   (ress, (PersistentState _ _ errs)) <- runStateT (observeManyT 1 $ runReaderT (evalStateT go initExplorerState) (eParams, tParams, topLevel)) (PersistentState Map.empty Map.empty [])
   case ress of
-    [] -> 
-      case errs of 
+    [] ->
+      case errs of
         [] -> return $ Left impossible
         (e:_) -> return $ Left e
     (res : _) -> return $ Right res

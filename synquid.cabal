@@ -19,7 +19,7 @@ flag synquid
 
 executable synquid
   main-is:            Synquid.hs
-  
+
   other-modules:      Synquid.Error
                     , Synquid.HtmlOutput
                     , Synquid.Logic
@@ -36,7 +36,7 @@ executable synquid
                     , Synquid.Tokens
                     , Synquid.Type
                     , Synquid.Util
-                    , Synquid.Z3  
+                    , Synquid.Z3
 
   other-extensions:   TemplateHaskell
                     , Rank2Types
@@ -50,18 +50,18 @@ executable synquid
                     , transformers >=0.3
                     , transformers-compat >=0.4
                     , lens >=3.7
-                    , ansi-wl-pprint >=0.6
+                    , ansi-wl-pprint ==0.6.9
                     , ansi-terminal >=0.6
                     , html >=1
-                    , bimap >= 0.2
-                    , z3 > 4.0
-                    , logict >= 0.5
-                    , parsec >= 3.1
-                    , indents >= 0.3
+                    , bimap >=0.2
+                    , z3 >4.0
+                    , logict >=0.5
+                    , parsec >=3.1
+                    , indents >=0.3
                     , cmdargs >=0.10
                     , filepath
                     , time
-                    , haskell-src-exts >= 1.17
+                    , haskell-src-exts >=1.17
                     , safe
                     , split
 
@@ -69,5 +69,5 @@ executable synquid
 
   hs-source-dirs:     src
   default-language:   Haskell2010
-  If !flag(synquid)
-    buildable: False
+  -- If !flag(synquid)
+  --   buildable: False

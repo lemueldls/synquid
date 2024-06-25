@@ -1,6 +1,6 @@
 module Synquid.HtmlOutput (
-  docHtml, 
-  showDocHtml, 
+  docHtml,
+  showDocHtml,
   renderHtmlNoHeader
   ) where
 
@@ -23,18 +23,18 @@ renderHtmlNoHeader theHtml = foldr (.) id (map (renderHtml' 0) (getHtmlElements 
 indentWidth = 7
 
 -- | String that represents a CSS attribute with given key and value.
-cssAttr key val = key ++ ": " ++ val ++ ";"    
+cssAttr key val = key ++ ": " ++ val ++ ";"
 
 -- | Apply a funtion to HTML content if it is non-empty
-applyToNonEmpty f content = if isNoHtml content 
-  then noHtml 
-  else f content  
-      
--- | 'splitLines' @sgrs indent currentLine next@ : 
+applyToNonEmpty f content = if isNoHtml content
+  then noHtml
+  else f content
+
+-- | 'splitLines' @sgrs indent currentLine next@ :
 -- Generate HTML for a document where the current line is indented by @indent@, starts with @currentLine@ and the current formating settings are @sgrs@,
 -- while @next@ is the rest of the document.
 -- We maintain that each line starts with a formatting operation.
-splitLines :: [SGR] -> Int -> (PP.SimpleDoc -> PP.SimpleDoc) -> PP.SimpleDoc -> Html 
+splitLines :: [SGR] -> Int -> (PP.SimpleDoc -> PP.SimpleDoc) -> PP.SimpleDoc -> Html
 splitLines sgrs indent currentLine next = case next of
   PP.SEmpty -> genLine
   PP.SChar c doc -> splitLines sgrs indent (currentLine . PP.SChar c) doc
@@ -45,8 +45,8 @@ splitLines sgrs indent currentLine next = case next of
     genLine = thediv ! [thestyle (cssAttr "margin-left" $ show indentPX ++ "px")] $ line
     indentPX = indent * indentWidth
     line = if isNoHtml content then spaceHtml else content
-    content = splitStyles [] id (currentLine PP.SEmpty)    
-    
+    content = splitStyles [] id (currentLine PP.SEmpty)
+
 -- | 'splitStyles' @sgrs currentSpan next@ :
 -- Generate HTML for a line where the current uni-formatted span of text starts with @currentSpan@ and has formatiing settings @sgrs@,
 -- while @next@ is the rest of the line.
@@ -57,12 +57,12 @@ splitStyles sgrs currentSpan next = case next of
   PP.SChar c doc -> splitStyles sgrs (currentSpan . PP.SChar c) doc
   PP.SText len s doc -> splitStyles sgrs (currentSpan . PP.SText len s) doc
   PP.SLine _ _ -> error "newline in splitStyles"
-  PP.SSGR sgrs' doc -> genSpan sgrs currentSpan +++ splitStyles sgrs' id doc  
-  where    
-    genSpan [] currentSpan = simple (currentSpan PP.SEmpty)  
-    genSpan [Reset] currentSpan = simple (currentSpan PP.SEmpty)  
-    genSpan sgrs currentSpan = applyToNonEmpty 
-      (thespan ! [thestyle (concatMap sgrToCss sgrs)]) 
+  PP.SSGR sgrs' doc -> genSpan sgrs currentSpan +++ splitStyles sgrs' id doc
+  where
+    genSpan [] currentSpan = simple (currentSpan PP.SEmpty)
+    genSpan [Reset] currentSpan = simple (currentSpan PP.SEmpty)
+    genSpan sgrs currentSpan = applyToNonEmpty
+      (thespan ! [thestyle (concatMap sgrToCss sgrs)])
       (simple $ currentSpan PP.SEmpty)
 
     sgrToCss (SetConsoleIntensity BoldIntensity)    = cssAttr "font-weight" "bold"
@@ -89,12 +89,11 @@ splitStyles sgrs currentSpan next = case next of
     sgrColor Dull Blue      = "DarkBlue"
     sgrColor Dull Magenta   = "DarkMagenta"
     sgrColor Dull Cyan      = "DarkCyan"
-    sgrColor Dull White     = "Gray"    
+    sgrColor Dull White     = "Gray"
 
 -- | Generate HTML for documents that do not contain new lines or formatting.
 simple PP.SEmpty  = noHtml
 simple (PP.SChar c doc) = toHtml c +++ simple doc
-simple (PP.SText _ s doc) = toHtml s +++ simple doc   
+simple (PP.SText _ s doc) = toHtml s +++ simple doc
 simple (PP.SLine indent doc) = error "newline in simple"
-simple (PP.SSGR sgrs doc) = error "formatting in simple"    
-      
+simple (PP.SSGR sgrs doc) = error "formatting in simple"

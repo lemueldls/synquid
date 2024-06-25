@@ -257,7 +257,7 @@ runOnFile synquidParams explorerParams solverParams file libs = do
       case mProg of
         Left typeErr -> pdoc (pretty typeErr) >> pdoc empty >> exitFailure
         Right prog -> do
-          when (gSynthesize goal) $ pdoc (prettySolution goal prog) >> pdoc empty          
+          when (gSynthesize goal) $ pdoc (prettySolution goal prog) >> pdoc empty
           return (goal, prog)
     printStats results declsByFile = do
       let env = gEnvironment (fst $ head results)

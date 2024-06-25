@@ -94,7 +94,7 @@ convertDatatypes symbols ((dtName, DatatypeDef [] _ _ ctors@(_:_) _):rest) = do
     (return ()) -- This datatype has already been processed as a dependency
     (do
       dtSymb <- mkStringSymbol dtName
-      z3ctors <- mapM convertCtor ctors      
+      z3ctors <- mapM convertCtor ctors
       z3dt <- mkDatatype dtSymb z3ctors
       sorts %= Map.insert dataSort z3dt
       storedDatatypes %= Set.insert dtName)
@@ -194,7 +194,7 @@ fmlToAST = toAST . simplify
     simplify expr = case expr of
       SetLit el xs -> SetLit el (map simplify xs)
       Unary op e -> Unary op (simplify e)
-      Binary op e1 e2 -> 
+      Binary op e1 e2 ->
         let e1' = simplify e1
             e2' = simplify e2
         in case sortOf e1' of
@@ -203,7 +203,7 @@ fmlToAST = toAST . simplify
                         Ge -> e2' |=>| e1'
                         Lt -> fnot e1' |&| e2'
                         Gt -> fnot e2' |&| e1'
-                        _  -> Binary op e1' e2' 
+                        _  -> Binary op e1' e2'
              _ -> Binary op e1' e2'
       Ite e0 e1 e2 -> Ite (simplify e0) (simplify e1) (simplify e2)
       Pred s name args -> Pred s name (map simplify args)

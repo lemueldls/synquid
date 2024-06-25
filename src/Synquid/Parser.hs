@@ -14,6 +14,7 @@ import Data.List
 import qualified Data.Map as Map
 import Data.Map (Map)
 
+import Control.Monad
 import Control.Monad.State
 import Control.Applicative hiding ((<|>), many)
 
@@ -128,8 +129,8 @@ parseConstructorSig = do
 
 parseMeasureConstantArgs :: Parser MeasureDefaults
 parseMeasureConstantArgs = many argWithName
-  where 
-    argWithName = do 
+  where
+    argWithName = do
       name <- parseIdentifier
       reservedOp ":"
       sort <- parseSort

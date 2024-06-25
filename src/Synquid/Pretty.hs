@@ -390,10 +390,10 @@ instance Pretty BareDeclaration where
   pretty (InlineDecl name args body) = keyword "inline" <+> text name <+> hsep (map text args) <+> operator "=" <+> pretty body
 
 prettyMeasureDefaults args = punctuateEnd (operator "->") $ map formatPair args
-  where 
-    formatPair (v, s) = text v <+> operator ":" <+> pretty s 
-    punctuateEnd op [] = empty 
-    punctuateEnd op [d] = d <+> op 
+  where
+    formatPair (v, s) = text v <+> operator ":" <+> pretty s
+    punctuateEnd op [] = empty
+    punctuateEnd op [d] = d <+> op
     punctuateEnd op (d:ds) = d <+> op <+> punctuateEnd op ds
 
 instance Pretty a => Pretty (Pos a) where

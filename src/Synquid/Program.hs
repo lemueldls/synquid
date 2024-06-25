@@ -157,7 +157,7 @@ fmlToUProgram (Ite gf f1 f2) = Program (PIf gp p1 p2) AnyT
     gp = fmlToUProgram gf
     p1 = fmlToUProgram f1
     p2 = fmlToUProgram f2
-fmlToUProgram (Cons _ x fs) = curriedApp fn fs 
+fmlToUProgram (Cons _ x fs) = curriedApp fn fs
   where
     fn = Program (PSymbol x) AnyT
     curriedApp :: RProgram -> [Formula] -> RProgram
@@ -575,13 +575,13 @@ predPolymorphic (x:xs) ps name inSorts outSort f = ForallP x (predPolymorphic xs
 
 -- Generate non-polymorphic core of schema
 genSkeleton :: Id -> [Id] -> [(Maybe Id, Sort)] -> Sort -> Formula -> SchemaSkeleton Formula
-genSkeleton name preds inSorts outSort post = Monotype $ uncurry 0 inSorts 
+genSkeleton name preds inSorts outSort post = Monotype $ uncurry 0 inSorts
   where
     uncurry n (x:xs) = FunctionT (fromMaybe ("arg" ++ show n) (fst x)) (ScalarT (toType (snd x)) ftrue) (uncurry (n + 1) xs)
     uncurry _ [] = ScalarT outType post
     toType s = case s of
       (DataS name args) -> DatatypeT name (map fromSort args) pforms
-      _ -> (baseTypeOf . fromSort) s 
+      _ -> (baseTypeOf . fromSort) s
     outType = (baseTypeOf . fromSort) outSort
     pforms = fmap predform preds
     predform x = Pred AnyS x []

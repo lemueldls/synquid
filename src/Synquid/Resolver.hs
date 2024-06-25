@@ -11,6 +11,7 @@ import Synquid.Pretty
 import Synquid.Util
 import Control.Applicative
 import Control.Monad.Except
+import Control.Monad
 import Control.Monad.State
 import Control.Lens
 import qualified Data.Map as Map
@@ -157,7 +158,7 @@ resolveDeclaration (PredDecl (PredSig name argSorts resSort)) = do
   mapM_ resolveSort (resSort : argSorts)
   env <- use environment
   let argSorts' = fmap (\x -> (Nothing, x)) argSorts
-  addNewSignature name (generateSchema env name argSorts' resSort ftrue) 
+  addNewSignature name (generateSchema env name argSorts' resSort ftrue)
   environment %= addGlobalPredicate name resSort argSorts
 resolveDeclaration (SynthesisGoal name impl) = do
   syms <- uses environment allSymbols
@@ -207,7 +208,7 @@ resolveSignatures (DataDecl dtName tParams pParams ctors) = mapM_ resolveConstru
 resolveSignatures (MeasureDecl measureName _ _ post defCases args _) = do
   sorts <- uses (environment . globalPredicates) (Map.! measureName)
   let (outSort : mArgs) = sorts
-  case last mArgs of 
+  case last mArgs of
     inSort@(DataS dtName sArgs) -> do
       datatype <- uses (environment . datatypes) (Map.! dtName)
       post' <- resolveTypeRefinement outSort post
@@ -249,7 +250,7 @@ resolveSignatures (MeasureDecl measureName _ _ post defCases args _) = do
               fml' <- withLocalEnv $ do
                 environment  . boundTypeVars .= boundVarsOf consSch
                 environment %= addAllVariables ctorParams
-                environment %= addAllVariables (fmap snd cSub) 
+                environment %= addAllVariables (fmap snd cSub)
                 resolveTypeRefinement (toSort $ baseTypeOf $ lastType consT) fml
               return $ MeasureCase ctorName (map varName ctorParams) fml'
 resolveSignatures (SynthesisGoal name impl) = do
@@ -258,25 +259,25 @@ resolveSignatures (SynthesisGoal name impl) = do
 resolveSignatures _ = return ()
 
 -- 'checkMeasureCase' @measure constArgs mCase@ : ensure that measure @name@ is called recursively with the same argumenst @constArgs@
-checkMeasureCase :: Id -> [(Id, Sort)] -> Formula -> Resolver () 
-checkMeasureCase measure [] _ = return () 
+checkMeasureCase :: Id -> [(Id, Sort)] -> Formula -> Resolver ()
+checkMeasureCase measure [] _ = return ()
 checkMeasureCase measure constArgs (Unary _ f) = checkMeasureCase measure constArgs f
-checkMeasureCase measure constArgs (Binary _ f g) = do 
-  checkMeasureCase measure constArgs f 
+checkMeasureCase measure constArgs (Binary _ f g) = do
+  checkMeasureCase measure constArgs f
   checkMeasureCase measure constArgs g
-checkMeasureCase measure constArgs (Ite f g h) = do 
-  checkMeasureCase measure constArgs f 
+checkMeasureCase measure constArgs (Ite f g h) = do
+  checkMeasureCase measure constArgs f
   checkMeasureCase measure constArgs g
   checkMeasureCase measure constArgs h
-checkMeasureCase measure constArgs (Cons _ _ fs) = 
+checkMeasureCase measure constArgs (Cons _ _ fs) =
   mapM_ (checkMeasureCase measure constArgs) fs
 checkMeasureCase measure constArgs p@(Pred s x args) =
   if x == measure
-    then do 
+    then do
       let args' = take numArgs args
       let cArgs' = fmap (\(x, _) -> Var AnyS x) constArgs
-      when (args' /= cArgs') $ throwResError $ text "Constant arguments to measure" <+> text measure <+> text "must not change in recursive call" <+> pretty p 
-    else mapM_ (checkMeasureCase measure constArgs) args 
+      when (args' /= cArgs') $ throwResError $ text "Constant arguments to measure" <+> text measure <+> text "must not change in recursive call" <+> pretty p
+    else mapM_ (checkMeasureCase measure constArgs) args
   where
     numArgs = length constArgs
 checkMeasureCase _ _ _ = return ()
@@ -663,8 +664,8 @@ freshSort = do
 
 -- | 'freshId' @p s@ : fresh var with prefix @p@ of sort @s@
 freshId :: String -> Sort -> Resolver Formula
-freshId p s = do 
-  i <- use idCount 
+freshId p s = do
+  i <- use idCount
   idCount %= (+ 1)
   return $ Var s (p ++ show i)
 
