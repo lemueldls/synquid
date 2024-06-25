@@ -12,5 +12,5 @@ extra-deps:
 # extra-lib-dirs:
 #  - <z3-home>/build
 nix:
-  enable: true
+  # enable: true
   packages: [z3]
