@@ -3,15 +3,10 @@ flags:
     synquid: true
 packages:
   - '.'
-resolver: lts-22.20
+resolver: lts-22.26
 extra-deps:
   - z3-408.2
   - ansi-wl-pprint-0.6.9
-  # - ansi-wl-pprint-0.6.9@sha256:fb737bc96e2aef34ad595d54ced7a73f648c521ebcb00fe0679aff45ccd49212,2448
-# extra-include-dirs:
-#   - /usr/local/include
-# extra-lib-dirs:
-#   - /usr/local/lib
 # extra-include-dirs:
 #  - <z3-home>/src/api
 # extra-lib-dirs:

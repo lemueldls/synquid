@@ -10,14 +10,6 @@
       systems = nixpkgs.lib.systems.flakeExposed;
       imports = [ inputs.haskell-flake.flakeModule ];
 
-      # # Set LIBCLANG_PATH to pkgs.libclang.lib
-      # flake = {
-      #   # Original flake attributes:
-
-      #   buildInputs = [ pkgs.libclang ];
-      #   LIBCLANG_PATH = "${pkgs.libclang.lib}/lib";
-      # };
-
       perSystem = { self', pkgs, ... }: {
 
         # Typically, you just want a single project named "default". But
@@ -49,7 +41,7 @@
 
           devShell = {
             tools = hp: { stack = hp.stack; fourmolu = hp.fourmolu; };
-            hlsCheck.enable = true;
+            # hlsCheck.enable = true;
 
             mkShellArgs = {
               buildInputs = with pkgs; [ z3 libclang.lib ];
