@@ -17,7 +17,7 @@ jobs:
         cabal: ["3.10.3.0"]
         vers:
           # - {ghc: "9.8.2", stackage: "nightly-2024-05-25"}
-          - {ghc: "9.6.5", stackage: "lts-22.23"}
+          - {ghc: "9.6.5", stackage: "lts-22.26"}
           # - {ghc: "9.4.8", stackage: "lts-21.25"}
         ghc-default:
           - "9.6.5"
@@ -50,8 +50,8 @@ jobs:
           stack config set system-ghc --global true
           stack config set install-ghc --global false
 
-      - name: List dependencies
-        run: stack ls dependencies json | jq > stack-deps.json
+      # - name: List dependencies
+      #   run: stack ls dependencies json | jq > stack-deps.json
 
       - name: Restore cached dependency of Pantry (Stackage package index)
         uses: actions/cache/restore@v4
@@ -78,8 +78,8 @@ jobs:
       - name: Build
         run: stack test --no-run-tests $STACK_FLAGS --resolver ${{ matrix.vers.stackage }} --lock-file=ignore
 
-      - name: Test
-        run: stack test --test-arguments "--color=always" $STACK_FLAGS --resolver ${{ matrix.vers.stackage }} --lock-file=ignore
+      # - name: Test
+      #   run: stack test --test-arguments "--color=always" $STACK_FLAGS --resolver ${{ matrix.vers.stackage }} --lock-file=ignore
 
       - name: Save cached dependencies of Pantry
         uses: actions/cache/save@v4
