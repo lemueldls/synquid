@@ -30,6 +30,7 @@ jobs:
         uses: cda-tum/setup-z3@v1
         with:
           version: ${{ matrix.z3 }}
+          add_to_library_path: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
