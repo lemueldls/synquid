@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup z3-${{ matrix.z3 }}
-        uses: pavpanchekha/setup-z3@6b2d476d7a9227e0d8d2b94f73cd9fcba91b5e98
+        uses: pavpanchekha/setup-z3
         with:
           version: ${{ matrix.z3 }}
 
@@ -87,3 +87,9 @@ jobs:
         with:
           path: ${{ steps.setup.outputs.stack-root }}/pantry
           key: ${{ steps.pantry.outputs.cache-primary-key }}
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: synquid-${{ runner.os }}
+          path: .stack-work/install/**/bin
