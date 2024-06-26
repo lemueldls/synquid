@@ -19,3 +19,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: freckle/stack-action@v5
+        with:
+          stack-build-arguments: --fast
