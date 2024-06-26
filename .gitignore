@@ -2,7 +2,7 @@ dist
 *.o
 *.hi
 /.stack-work/
-stack.yaml.lock
+/dist-newstyle/
 
 # Devenv
 .devenv*
