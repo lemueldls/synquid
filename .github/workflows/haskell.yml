@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    name: ghc-${{ matrix.vers.ghc }} z3-${{ matrix.z3 }}
+    name: ${{ matrix.os }} ghc-${{ matrix.vers.ghc }} z3-${{ matrix.z3 }}
 
     strategy:
       matrix:
@@ -33,9 +33,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Workaround runner image issue
-        # https://github.com/actions/runner-images/issues/7061
-        run: sudo chown -R $USER /usr/local/.ghcup
+      # - name: Workaround runner image issue
+      #   # https://github.com/actions/runner-images/issues/7061
+      #   run: sudo chown -R $USER /usr/local/.ghcup
 
       - name: Setup Stack
         uses: haskell-actions/setup@v2
