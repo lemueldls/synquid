@@ -18,6 +18,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: freckle/stack-action@v5
-        with:
-          stack-build-arguments: --fast
+        - uses: haskell-actions/setup@v2
+              with:
+                ghc-version: '9.6.5'
+                enable-stack: true
