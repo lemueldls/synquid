@@ -28,9 +28,11 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup z3-${{ matrix.z3 }}
-        uses: pavpanchekha/setup-z3
+        uses: cda-tum/setup-z3@v1
         with:
           version: ${{ matrix.z3 }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Workaround runner image issue
         # https://github.com/actions/runner-images/issues/7061
@@ -81,15 +83,15 @@ jobs:
       # - name: Test
       #   run: stack test --test-arguments "--color=always" $STACK_FLAGS --resolver ${{ matrix.vers.stackage }} --lock-file=ignore
 
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: synquid-${{ runner.os }}
+          path: .stack-work/install/**/bin
+
       - name: Save cached dependencies of Pantry
         uses: actions/cache/save@v4
         if: steps.pantry.outputs.cache-hit != 'true'
         with:
           path: ${{ steps.setup.outputs.stack-root }}/pantry
           key: ${{ steps.pantry.outputs.cache-primary-key }}
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: synquid-${{ runner.os }}
-          path: .stack-work/install/**/bin
