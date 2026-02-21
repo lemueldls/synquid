@@ -27,6 +27,7 @@ executable synquid
                     , Synquid.Pretty
                     , Synquid.Program
                     , Synquid.Resolver
+                    , Synquid.Generator
                     , Synquid.SolverMonad
                     , Synquid.HornSolver
                     , Synquid.TypeConstraintSolver
@@ -64,6 +65,10 @@ executable synquid
                     , haskell-src-exts >=1.17
                     , safe
                     , split
+                    , quickcheck-classes
+                    , QuickCheck
+                    , quickcheck-instances
+                    , random
 
   ghc-options: -O2
 

@@ -48,6 +48,7 @@
 
               shellHook = ''
                 export LIBCLANG_PATH="${pkgs.libclang.lib}/lib"
+                alias cargo="echo 'Use stack instead of cargo'"
               '';
             };
           };

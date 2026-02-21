@@ -220,6 +220,7 @@ toAST expr = case expr of
   IntLit i -> mkIntNum i
   Var s name -> var s name
   Unknown _ name -> error $ unwords ["toAST: encountered a second-order unknown", name]
+  -- Unary Not e@(Binary {}) -> toAST (fnot e)
   Unary op e -> toAST e >>= unOp op
   Binary op e1 e2 -> join (binOp op <$> toAST e1 <*> toAST e2)
   Ite e0 e1 e2 -> do

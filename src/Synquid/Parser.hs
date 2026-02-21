@@ -182,6 +182,16 @@ parseInlineDecl = do
   body <- parseFormula
   return $ InlineDecl name args body
 
+
+parseGenDecl :: Parser BareDeclaration
+parseGenDecl = do
+  reserved "gen"
+  name <- parseIdentifier
+  args <- many parseIdentifier
+  reservedOp "="
+  body <- parseFormula
+  return $ GenDecl name args body
+
 parseFuncDeclOrGoal :: Parser BareDeclaration
 parseFuncDeclOrGoal = do
   funcName <- parseIdentifier

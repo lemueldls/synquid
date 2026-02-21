@@ -447,6 +447,7 @@ allScalars :: Environment -> [Formula]
 allScalars env = mapMaybe toFormula $ Map.toList $ symbolsOfArity 0 env
   where
     toFormula (_, ForallT _ _) = Nothing
+    -- toFormula (x, ForallP _ _) = Nothing
     toFormula (x, _) | x `Set.member` (env ^. letBound) = Nothing
     toFormula (x, Monotype t) = case t of
       ScalarT IntT  (Binary Eq _ (IntLit n)) -> Just $ IntLit n
@@ -655,7 +656,10 @@ finalizeProgram p = do
   tass <- use typeAssignment
   pass <- use predAssignment
   sol <- uses candidates (solution . head)
-  return $ fmap (typeApplySolution sol . typeSubstitutePred pass . typeSubstitute tass) p
+  let b = typeSubstitute tass
+  let a = typeSubstitutePred pass . b
+  let f = typeApplySolution sol . a
+  return $ fmap f p
 
 instance Eq TypingState where
   (==) st1 st2 = (restrictDomain (Set.fromList ["a", "u"]) (_idCount st1) == restrictDomain (Set.fromList ["a", "u"]) (_idCount st2)) &&

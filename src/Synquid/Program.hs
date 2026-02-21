@@ -490,6 +490,7 @@ data BareDeclaration =
   QualifierDecl [Formula] |                                 -- ^ Qualifiers
   MutualDecl [Id] |                                         -- ^ Mutual recursion group
   InlineDecl Id [Id] Formula |                              -- ^ Inline predicate
+  GenDecl Id [Id] Formula |                                 -- ^ Generator
   SynthesisGoal Id UProgram                                 -- ^ Name and template for the function to reconstruct
   deriving (Show, Eq)
 

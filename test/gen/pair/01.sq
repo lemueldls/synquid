@@ -1,0 +1,37 @@
+--| For our first example, we will generate pairs of integers.
+--|
+--| We will define a function `g` that takes an `Arbitrary a` value and returns a value of the containing type `a`.
+--|
+--| The generated program is incorrect, because it prefers `rand_eq three` over `rand_leq three`.
+--|
+--| We can solve this by generating the contrapositive of the predicate and goal,
+--| but we can't define a `g_not` yet, because `{ a | False }` is not a valid constraint.
+
+three :: { Int | _v == 3 }
+
+plus :: x: Int -> y: Int -> { Int | _v == x + y }
+
+data Arbitrary a
+
+g :: x: Arbitrary a -> a
+-- g_not :: x: Arbitrary a -> { a | False }
+
+-- rand_int :: Arbitrary Int
+
+rand_eq :: x: a -> Arbitrary { a | _v == x }
+-- rand_lt :: x: a -> Arbitrary { a | _v < x }
+rand_leq :: x: a -> Arbitrary { a | _v <= x }
+-- rand_gt :: x: a -> Arbitrary { a | _v > x }
+-- rand_geq :: x: a -> Arbitrary { a | _v >= x }
+
+pair :: x: { Int | _v <= 3 } -> y: { Int | _v == x + 3 } -> Int
+
+gen_pair :: Int
+gen_pair =
+  let x = ?? in
+  let x_value = g x in
+
+  let y = ?? in
+  let y_value = g y in
+
+  pair x_value y_value

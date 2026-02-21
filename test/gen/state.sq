@@ -1,0 +1,91 @@
+zero :: { Int | _v == 0 }
+one :: { Int | _v == 1 }
+two :: { Int | _v == 2 }
+three :: { Int | _v == 3 }
+-- four :: { Int | _v == 4 }
+-- five :: { Int | _v == 5 }
+-- six :: { Int | _v == 6 }
+-- seven :: { Int | _v == 7 }
+-- eight :: { Int | _v == 8 }
+-- nine :: { Int | _v == 9 }
+-- ten :: { Int | _v == 10 }
+-- eleven :: { Int | _v == 11 }
+-- twelve :: { Int | _v == 12 }
+
+-- neg_ten :: { Int | _v == -10 }
+
+-- eq :: x: Int -> y: Int -> { Bool | _v == (x == y) }
+-- neq :: x: Int -> y: Int -> { Bool | _v == (x != y) }
+-- gt :: x: Int -> y: Int -> { Bool | _v == (x > y) }
+-- lt :: x: Int -> y: Int -> { Bool | _v == (x < y) }
+-- ge :: x: Int -> y: Int -> { Bool | _v == (x >= y) }
+-- le :: x: Int -> y: Int -> { Bool | _v == (x <= y) }
+
+-- times :: x: Int -> y: Int -> { Int | _v == x * y }
+plus :: x: Int -> y: Int -> { Int | _v == x + y }
+-- minus :: x: Int -> y: Int -> { Int | _v == x - y }
+
+-- neg :: x: Int -> { Int | _v == -x }
+-- abs :: x: Int -> { Int | if x >= 0 then _v == x else _v == -x }
+
+-- and :: x: Bool -> y: Bool -> { Bool | _v == (x && y) }
+-- or :: x: Bool -> y: Bool -> { Bool | _v == (x || y) }
+-- not :: x: Bool -> { Bool | _v == !x }
+
+-- implies :: x: Bool -> y: Bool -> { Bool | _v == (x ==> y) }
+-- ifte :: cond: Bool -> thn: a -> els: a -> { a | _v == if cond then thn else els }
+
+-- union :: x: Set a -> y: Set a -> { Set a | _v == x + y }
+-- intersection :: x: Set a -> y: Set a -> { Set a | _v == x * y }
+-- difference :: x: Set a -> y: Set a -> { Set a | _v == x - y }
+-- member :: x: a -> y: Set a -> { Bool | _v == (x in y) }
+-- subset :: x: Set a -> y: Set a -> { Bool | _v == (x <= y) }
+
+data Unit where
+  Unit :: Unit
+
+-- data IntG
+-- data RangeG a b
+
+data Formula a
+
+pure :: x: a -> Formula a
+
+intG :: Formula Int
+
+-- rangeG :: x: Int -> y: Int -> Formula (Range x y)
+
+
+-- data Arbitrary a where
+--   Arbitrary :: x: a -> Arbitrary a
+data GenResult a where
+  GenResult :: x: a -> GenResult a
+-- data Arbitrary a
+
+-- g :: x: Arbitrary a -> a
+
+gen :: f: Formula a -> a
+
+-- randPure :: x: a -> t: Unit -> tt: Unit -> ttt: Unit -> Arbitrary a
+-- randInt :: IntG Int
+-- randBool :: Arbitrary Bool
+-- randBetween :: x: Int -> y: Int -> Arbitrary { Int | x <= _v && _v <= y }
+-- randLeq :: x: Int -> t: Unit -> Arbitrary { Int | _v <= x }
+-- randGeq :: x: Int -> t: Unit -> Arbitrary { Int | _v >= x }
+
+noop :: <p :: a -> Bool> . GenResult a
+
+
+pair :: x: Int -> y: { Int | _v == x + 3 } -> Int
+pair = ??
+
+gen_pair :: GenResult Int
+gen_pair =
+  let x = gen (?? :: Formula Int) in
+  let y = gen (?? :: Formula Int) in
+  GenResult (pair x y)
+-- gen_pair :: GenResult Int
+-- gen_pair =
+--   let x = gen (IntG :: Formula Int) in
+--   let y = gen (PureG (x + three) :: Formula Int) in
+--   GenResult (pair x y)

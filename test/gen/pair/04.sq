@@ -1,0 +1,62 @@
+--| For the fourth example, we create a new type `Expr` that represents expressions of type `a`.
+--|
+--| We define a measure `not` that takes in an `Expr a` and returns a `Bool` that is the negation of the expression.
+--|
+--| We define `eval` that takes in a value `v` of type `a` and an `Expr a` and returns a `Bool` that is the value of the expression in the context of `v`.
+--|
+--| Finally, we define `g_not` that works correctly!! :tada:
+--| Even if you manually give it an incorrect program, it will reject it.
+--|
+--| This does feel kind of overkill, but this is the only way to make I can make sure that the program is correct..
+--|
+--| However, it's worth mentioning that using `||` instead `&&` and (eval _v (not x) || !(eval _v x)) is still insufficient.
+--| In fact, doing either `eval _v (not x)` or `!(eval _v x)` by themselves is insufficient for synthesis, even though they should equivalent.
+
+three :: { Int | _v == 3 }
+
+plus :: x: Int -> y: Int -> { Int | _v == x + y }
+
+data Expr a where
+  Eq :: x: a -> Expr a
+  Neq :: x: a -> Expr a
+  Lt :: x: a -> Expr a
+  Gt :: x: a -> Expr a
+  And :: lhs: Expr a -> rhs: Expr a -> Expr a
+  Or :: lhs: Expr a -> rhs: Expr a -> Expr a
+
+measure eval :: v: a -> Expr a -> Bool where
+  Eq x -> v == x
+  Neq x -> v != x
+  Lt x -> v < x
+  Gt x -> v > x
+  And lhs rhs -> eval v lhs && eval v rhs
+  Or lhs rhs -> eval v lhs || eval v rhs
+
+measure not :: Expr a -> Expr a where
+  Eq x -> Neq x
+  Neq x -> Eq x
+  Lt x -> Or (Gt x) (Eq x)
+  Gt x -> Or (Lt x) (Eq x)
+  And lhs rhs -> Or (not lhs) (not rhs)
+  Or lhs rhs -> And (not lhs) (not rhs)
+
+g :: x: Expr a -> { a | eval _v x }
+g_not :: x: Expr a -> { a | eval _v (not x) && !(eval _v x) }
+
+rand_int :: Expr Int
+
+pair :: x: { Int | _v <= 3 } -> y: { Int | _v == x + 3 } -> Int
+pair_not_x :: x: { Int | _v <= 3 }                             -> x_not: { Int | !(_v <= 3) } -> Bool
+pair_not_y :: x: { Int | _v <= 3 } -> y: { Int | _v == x + 3 } -> y_not: { Int | !(_v == x + 3) } -> Bool
+
+gen_pair :: Int
+gen_pair =
+  let x = ?? in
+  let x_value = g x in
+  let _ = pair_not_x x_value (g_not x) in
+
+  let y = ?? in
+  let y_value = g y in
+  let _ = pair_not_y x_value y_value (g_not y) in
+
+  pair x_value y_value

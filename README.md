@@ -1,4 +1,4 @@
-# Synquid #
+# Synquid
 
 Synquid synthesizes programs from refinement types.
 

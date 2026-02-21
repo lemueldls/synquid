@@ -64,6 +64,8 @@ data ExplorerParams = ExplorerParams {
   _explorerLogLevel :: Int                -- ^ How verbose logging is
 }
 
+-- instance Show ExplorerParams
+
 makeLenses ''ExplorerParams
 
 type Requirements = Map Id [RType]

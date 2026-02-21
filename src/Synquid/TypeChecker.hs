@@ -11,6 +11,7 @@ import Synquid.Explorer
 import Synquid.Util
 import Synquid.Pretty
 import Synquid.Resolver
+import Synquid.Generator
 
 import qualified Data.Set as Set
 import Data.Set (Set)
@@ -35,7 +36,10 @@ reconstruct eParams tParams goal = do
   where
     go = do
       pMain <- reconstructTopLevel goal { gDepth = _auxDepth eParams }     -- Reconstruct the program
+      ax <- use solvedAuxGoals
+      -- traceShow pMain (pure ())
       p <- flip insertAuxSolutions pMain <$> use solvedAuxGoals            -- Insert solutions for auxiliary goals stored in @solvedAuxGoals@
+      -- traceShow (p) (pure ())
       runInSolver $ finalizeProgram p                                      -- Substitute all type/predicates variables and unknowns
 
 reconstructTopLevel :: MonadHorn s => Goal -> Explorer s RProgram
@@ -306,6 +310,7 @@ etaExpand t f = do
 -- @pMain@ is assumed to contain either a "let x = ??" or "f x ...", where "x" is an auxiliary goal name
 insertAuxSolutions :: Map Id RProgram -> RProgram -> RProgram
 insertAuxSolutions pAuxs (Program body t) = flip Program t $
+  -- traceShow ("body: " ++ show body) $
   case body of
     PLet y def p -> case Map.lookup y pAuxs of
                       Nothing -> PLet y (ins def) (ins p)
@@ -317,7 +322,10 @@ insertAuxSolutions pAuxs (Program body t) = flip Program t $
     PFun y p -> PFun y (ins p)
     PIf c p1 p2 -> PIf (ins c) (ins p1) (ins p2)
     PMatch s cases -> PMatch (ins s) (map (\(Case c args p) -> Case c args (ins p)) cases)
-    PFix ys p -> PFix ys (ins p)
+    PFix ys p -> fix ys p
     _ -> body
   where
     ins = insertAuxSolutions pAuxs
+    fix ys p =
+        -- traceShow ys $
+        PFix ys (ins p)

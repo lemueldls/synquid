@@ -13,7 +13,7 @@ import Synquid.Resolver
 import Synquid.TypeConstraintSolver
 import Synquid.Explorer
 import Synquid.TypeChecker
-
+import Debug.Trace
 import Data.Maybe
 import Data.Either
 import Data.List
@@ -21,7 +21,6 @@ import qualified Data.Set as Set
 import Data.Set (Set)
 import qualified Data.Map as Map
 import Data.Map (Map)
-import Control.Monad
 import Control.Monad
 import Control.Monad.State
 import Control.Lens
@@ -40,7 +39,15 @@ type HornSolver = FixPointSolver Z3State
 -- using conditional qualifiers @cquals@ and type qualifiers @tquals@,
 -- with parameters for template generation, constraint generation, and constraint solving @templGenParam@ @consGenParams@ @solverParams@ respectively
 synthesize :: ExplorerParams -> HornSolverParams -> Goal -> [Formula] -> [Formula] -> IO (Either ErrorMessage RProgram)
-synthesize explorerParams solverParams goal cquals tquals = evalZ3State $ evalFixPointSolver reconstruction solverParams
+synthesize explorerParams solverParams goal cquals tquals = do
+    -- putStrLn $ "params: " ++ show explorerParams
+    -- putStrLn $ "goal: " ++ show goal
+    -- putStrLn $ "unresolved constants: " ++ show ((gEnvironment goal) ^. unresolvedConstants)
+    -- putStrLn $ "cquals: " ++ show cquals
+    -- putStrLn $ "tquals: " ++ show tquals
+    x <- evalZ3State $ evalFixPointSolver reconstruction solverParams
+    -- putStrLn $ "result: " ++ show x
+    return x
   where
     -- | Stream of programs that satisfy the specification or type error
     reconstruction :: HornSolver (Either ErrorMessage RProgram)

@@ -6,6 +6,7 @@ module Synquid.Resolver (resolveDecls, resolveRefinement, resolveRefinedType, ad
 import Synquid.Logic
 import Synquid.Type
 import Synquid.Program
+import Synquid.Generator
 import Synquid.Error
 import Synquid.Pretty
 import Synquid.Util
@@ -57,13 +58,27 @@ initResolverState = ResolverState {
 }
 
 -- | Convert a parsed program AST into a list of synthesis goals and qualifier maps
-resolveDecls :: [Declaration] -> Either ErrorMessage ([Goal], [Formula], [Formula])
+-- resolveDecls :: [Declaration] -> Either ErrorMessage ([Goal], [Formula], [Formula])
+resolveDecls :: [Pos BareDeclaration] -> Either ErrorMessage ([Goal], [Formula], [Formula])
 resolveDecls declarations =
   case runExcept (execStateT go initResolverState) of
     Left msg -> Left msg
-    Right st ->
-      Right (typecheckingGoals st ++ synthesisGoals st, st ^. condQualifiers, st ^. typeQualifiers)
+    Right st -> do
+      let goals = typecheckingGoals st ++ synthesisGoals st
+
+      let generators = map generateFromGoal goals
+      -- mapM_ checkAndAddDeclaration generators
+
+      Right (goals, st ^. condQualifiers, st ^. typeQualifiers)
   where
+    checkAndAddDeclaration (genProgram, genGoal) = do
+        let name = gName genGoal
+        let sch = gSpec genGoal
+
+        addNewSignature name sch
+
+        traceShowM $ prettySpec genGoal
+        traceShowM $ prettySolution genGoal genProgram
     go = do
       -- Pass 1: collect all declarations and resolve sorts, but do not resolve refinement types yet
       mapM_ (extractPos resolveDeclaration) declarations'
@@ -647,8 +662,11 @@ addNewSignature name sch = do
   environment %= addPolyConstant name sch
   environment %= addUnresolvedConstant name sch
 
+
+substituteTypeSynonym :: (MonadState ResolverState m, MonadError ErrorMessage m) => Id -> [RType] -> m RType
 substituteTypeSynonym name tArgs = do
   tss <- use $ environment . typeSynonyms
+  -- traceShow  3.0 $ pure ("TSS:" ++ show tss)
   case Map.lookup name tss of
     Nothing -> throwResError $ text "Datatype or synonym" <+> text name <+> text "is undefined"
     Just (tVars, t) -> do

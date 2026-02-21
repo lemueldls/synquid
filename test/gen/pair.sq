@@ -1,0 +1,52 @@
+three :: { Int | _v == 3 }
+
+plus :: x: Int -> y: Int -> { Int | _v == x + y }
+
+data Expr a where
+  Eq :: x: a -> Expr a
+  Neq :: x: a -> Expr a
+  Lt :: x: a -> Expr a
+  Gt :: x: a -> Expr a
+  And :: lhs: Expr a -> rhs: Expr a -> Expr a
+  Or :: lhs: Expr a -> rhs: Expr a -> Expr a
+
+measure eval :: v: a -> Expr a -> Bool where
+  Eq x -> v == x
+  Neq x -> v != x
+  Lt x -> v < x
+  Gt x -> v > x
+  And lhs rhs -> eval v lhs && eval v rhs
+  Or lhs rhs -> eval v lhs || eval v rhs
+
+measure not :: Expr a -> Expr a where
+  Eq x -> Neq x
+  Neq x -> Eq x
+  Lt x -> Or (Gt x) (Eq x)
+  Gt x -> Or (Lt x) (Eq x)
+  And lhs rhs -> Or (not lhs) (not rhs)
+  Or lhs rhs -> And (not lhs) (not rhs)
+
+g :: x: Expr Int -> { Int | eval _v x }
+g_not :: x: Expr Int -> { Int | eval _v (not x) && !(eval _v x) }
+
+data Unit
+void :: <p :: a -> Bool> . x: a -> Unit
+
+randInt :: Expr Int
+
+pair :: x: { Int | _v <= 3 } -> y: { Int | _v == x + 3 } -> Int
+pair_not_x :: x: { Int | _v <= 3 } -> _x: { Int | !(_v <= 3) } -> Int
+pair_not_y :: x: { Int | _v <= 3 } -> y: { Int | _v == x + 3 } -> _y: { Int | !(_v == x + 3) } -> Int
+
+gen_pair :: Int
+gen_pair =
+  let x = ?? in
+  -- let x = Eq 3 in
+  let x_value = g x in
+  -- let _ = void (pair_not_x x_value (g_not x)) in
+
+  let y = ?? in
+  let y_value = g y in
+  -- let _ = void (pair_not_y x_value y_value (g_not y)) in
+
+  pair x_value y_value

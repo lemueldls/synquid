@@ -1,0 +1,55 @@
+zero :: { Int | _v == 0 }
+-- one :: { Int | _v == 1 }
+-- two :: { Int | _v == 2 }
+-- three :: { Int | _v == 3 }
+-- four :: { Int | _v == 4 }
+-- five :: { Int | _v == 5 }
+-- six :: { Int | _v == 6 }
+-- seven :: { Int | _v == 7 }
+-- eight :: { Int | _v == 8 }
+-- nine :: { Int | _v == 9 }
+-- ten :: { Int | _v == 10 }
+-- eleven :: { Int | _v == 11 }
+-- twelve :: { Int | _v == 12 }
+
+two_five_five :: { Int | _v == 255 }
+
+data Expr a where
+  Eq :: x: a -> Expr a
+  Neq :: x: a -> Expr a
+  Lt :: x: a -> Expr a
+  Gt :: x: a -> Expr a
+  And :: lhs: Expr a -> rhs: Expr a -> Expr a
+  Or :: lhs: Expr a -> rhs: Expr a -> Expr a
+
+measure eval :: v: a -> Expr a -> Bool where
+  Eq x -> v == x
+  Neq x -> v != x
+  Lt x -> v < x
+  Gt x -> v > x
+  And lhs rhs -> eval v lhs && eval v rhs
+  Or lhs rhs -> eval v lhs || eval v rhs
+
+measure not :: Expr a -> Expr a where
+  Eq x -> Neq x
+  Neq x -> Eq x
+  Lt x -> Or (Gt x) (Eq x)
+  Gt x -> Or (Lt x) (Eq x)
+  And lhs rhs -> Or (not lhs) (not rhs)
+  Or lhs rhs -> And (not lhs) (not rhs)
+
+g :: x: Expr Int -> { Int | eval _v x }
+g_not :: x: Expr Int -> { Int | eval _v (not x) && !(eval _v x) }
+
+-- randInt :: Expr Int
+
+byte :: x: { Int | (_v >= 0 && _v <= 255) } -> Int
+byte_x_not :: x: { Int | _v >= 0 && _v <= 255 } -> x_not: { Int | !(_v >= 0 && _v <= 255) } -> Int
+
+gen_byte :: Int
+gen_byte =
+  let x = (?? :: Expr Int) in
+  let x_value = g x in
+  let _ = byte_x_not x_value (g_not x) in
+
+  byte x_value

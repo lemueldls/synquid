@@ -1,0 +1,50 @@
+--| For our second example, we generate the contrapositive of the predicate and goal.
+--|
+--| The `Arbitrary` type now has a constructor `Arbitrary` so we can define the measure `unwrap` that gets the value.
+--|
+--| We define a function `g_not` that takes an `Arbitrary a` value and returns the negation of what `g` would return.
+--|
+--| We define `pair_x_not` and `pair_y_not` that take in a `Arbitrary a` value and return the negation of what all
+--| arguments of `pair` would return, and require that the negation of the argument satisfies the arguments of `g_not`.
+--|
+--| This example fails to synthesize a program, because it cannot find a satisfying program for `g_not`.
+--| (then tries to match `Bool` with `Int` since it ran out of all the better programs)
+--|
+--| Commenting out both `let _ = ...` would yield a similar program as the first example.
+
+three :: { Int | _v == 3 }
+
+plus :: x: Int -> y: Int -> { Int | _v == x + y }
+
+data Arbitrary a where
+  Arbitrary :: x: a -> Arbitrary a
+
+measure unwrap :: Arbitrary a -> a where
+  Arbitrary x -> x
+
+-- g :: x: Arbitrary Int -> { Int | _v == unwrap x }
+-- g_not :: x: Arbitrary Int -> { Int | _v == unwrap x }
+g :: x: Arbitrary a -> { a | _v == unwrap x }
+g_not :: x: Arbitrary a -> { a | _v != unwrap x }
+
+rand_eq :: x: a -> Arbitrary { a | _v == x }
+-- rand_lt :: x: a -> Arbitrary { a | _v < x }
+rand_leq :: x: a -> Arbitrary { a | _v <= x }
+-- rand_gt :: x: a -> Arbitrary { a | _v > x }
+-- rand_geq :: x: a -> Arbitrary { a | _v >= x }
+
+pair :: x: { Int | _v <= 3 } -> y: { Int | _v == x + 3 } -> Int
+pair_x_not :: x: { Int | _v <= 3 }                             -> x_not: { Int | !(_v <= 3) } -> Bool
+pair_y_not :: x: { Int | _v <= 3 } -> y: { Int | _v == x + 3 } -> y_not: { Int | !(_v == x + 3) } -> Bool
+
+gen_pair :: Int
+gen_pair =
+  let x = ?? in
+  let x_value = g x in
+  -- let _ = pair_not_x x_value (g_not x) in
+
+  let y = ?? in
+  let y_value = g y in
+  -- let _ = pair_not_y x_value y_value (g_not y) in
+
+  pair x_value y_value

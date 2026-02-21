@@ -1,0 +1,43 @@
+--| For the third example, we separate the base type and refinements in the `Arbitrary` type.
+--|
+--| The `Arbitrary` type now takes in a base type `a` and a predicate `p :: a -> Bool`.
+--|
+--| We define a function `g_not` that takes an `Arbitrary a <p>` value and returns a satisfying `!(p _v)`.
+--|
+--| This example still fails to synthesize a program, because it cannot find a satisfying program for `g_not`.
+--| (then tries to match `Bool` with `Int` since it ran out of all the better programs)
+--|
+--| Commenting out both `let _ = ...` would yield a similar program as the first example.
+
+three :: { Int | _v == 3 }
+
+plus :: x: Int -> y: Int -> { Int | _v == x + y }
+
+data Arbitrary a <p :: a -> Bool>
+
+g :: <p :: a -> Bool> . x: Arbitrary a <p> -> { a | p _v }
+g_not :: <p :: a -> Bool> . x: Arbitrary a <p> -> { a | !(p _v) }
+
+-- rand_int :: Arbitrary Int <{True}>
+
+rand_eq :: x: a -> Arbitrary a <{ _0 == x }>
+-- rand_lt :: x: a -> Arbitrary a <{ _0 < x }>
+rand_leq :: x: a -> Arbitrary a <{ _0 <= x }>
+-- rand_gt :: x: a -> Arbitrary a <{ _0 > x }>
+-- rand_geq :: x: a -> Arbitrary a <{ _0 >= x }>
+
+pair :: x: { Int | _v <= 3 } -> y: { Int | _v == x + 3 } -> Int
+pair_x_not :: x: { Int | _v <= 3 }                             -> x_not: { Int | !(_v <= 3) } -> Bool
+pair_y_not :: x: { Int | _v <= 3 } -> y: { Int | _v == x + 3 } -> y_not: { Int | !(_v == x + 3) } -> Bool
+
+gen_pair :: Int
+gen_pair =
+  let x = ?? in
+  let x_value = g x in
+  -- let _ = pair_not_x x_value (g_not x) in
+
+  let y = ?? in
+  let y_value = g y in
+  -- let _ = pair_not_y x_value y_value (g_not y) in
+
+  pair x_value y_value

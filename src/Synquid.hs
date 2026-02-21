@@ -33,6 +33,8 @@ import qualified Text.PrettyPrint.ANSI.Leijen as PP
 import Text.PrettyPrint.ANSI.Leijen (fill, column)
 
 import Data.List.Split
+import Debug.Trace (traceShow)
+import Synquid.Generator
 
 programName = "synquid"
 versionName = "0.4"
@@ -232,6 +234,8 @@ runOnFile synquidParams explorerParams solverParams file libs = do
   case resolveDecls decls of
     Left resolutionError -> (pdoc $ pretty resolutionError) >> pdoc empty >> exitFailure
     Right (goals, cquals, tquals) -> when (not $ resolveOnly synquidParams) $ do
+      -- traceShow (goals, cquals, tquals) (pure ())
+
       results <- mapM (synthesizeGoal cquals tquals) (requested goals)
       when (not (null results) && showStats synquidParams) $ printStats results declsByFile
   where
@@ -248,7 +252,10 @@ runOnFile synquidParams explorerParams solverParams file libs = do
       _ -> goals
     pdoc = printDoc (outputFormat synquidParams)
     synthesizeGoal cquals tquals goal = do
-      when ((gSynthesize goal) && (showSpec synquidParams)) $ pdoc (prettySpec goal)
+      -- putStrLn $ "goal: " ++ show (gSpec goal)
+      -- putStrLn $ "cquals: " ++ show (cquals)
+      -- putStrLn $ "tquals: " ++ show (tquals)
+
       -- print empty
       -- print $ vMapDoc pretty pretty (allSymbols $ gEnvironment goal)
       -- print $ pretty (gSpec goal)

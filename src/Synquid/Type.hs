@@ -126,7 +126,7 @@ predsOfType (LetT x tDef tBody) = predsOfType tDef `Set.union` predsOfType tBody
 predsOfType AnyT = Set.empty
 
 varRefinement x s = Var s valueVarName |=| Var s x
-isVarRefinemnt (Binary Eq (Var _ v) (Var _ _)) = v == valueVarName
+isVarRefinemnt (Binary Eq (Var _ v) (Var _ w)) = v == valueVarName || w == valueVarName
 isVarRefinemnt _ = False
 
 -- | Polymorphic type skeletons (parametrized by refinements)
